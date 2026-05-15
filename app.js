@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .then(data => {
                 const featuredMeals = data.meals.slice(0, 6);
-                renderRecipes(featuredMeals, "Featured Seafood Recipes");
+                renderRecipes(featuredMeals, `${featuredMeals[0].strMeal}`);
             })
             .catch(err => {
                 // Log error for debugging, then trigger fallback
@@ -124,6 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("isLoggedIn", "true");
             localStorage.setItem("username", username);
             window.location.href = "index.html";
+            console.log(`Why are you looking here, ${username}?\n I know what you did last summer!`);
         });
     }
 
