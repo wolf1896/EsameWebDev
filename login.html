@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Login to Recipe Finder to plan your meals and discover new foods.">
+    <meta name="author" content="Your Name">
+    <title>Login - Recipe App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="center-layout">
+    <main>
+        <section class="card login-card">
+            <h1>Welcome Back</h1>
+            <p>Please log in to access your meal planner.</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required minlength="3">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required minlength="6">
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <p id="authFeedback" class="feedback"></p>
+            </form>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
