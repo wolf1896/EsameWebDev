@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover new recipes and plan your meals.">
+    <title>Home - Recipe App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">RecipeApp</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="planner.html">Planner</a></li>
+                <li><a href="profile.html">Profile</a></li>
+            </ul>
+            <button id="logoutBtn" class="btn btn-outline">Logout</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="search-section">
+            <h2>Find a Recipe</h2>
+            <form id="searchForm">
+                <input type="text" id="searchInput" placeholder="Search for a meal (e.g., chicken)..." required>
+                <button type="submit" class="btn">Search</button>
+            </form>
+            <p id="searchFeedback" class="feedback"></p>
+        </section>
+
+        <section id="recipeContainer" class="recipe-grid">
+            </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
