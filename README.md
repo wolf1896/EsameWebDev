@@ -25,4 +25,4 @@ This project is an interactive, dynamic web application developed as a Final Exa
 5. Use the navigation bar to move between the Home, Planner, and Profile views.
 
 ## Author
-[Mattia Lupo]
+Mattia Lupo
