@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 feedback.textContent = "Username must be at least 3 characters."; // Feedback [cite: 27]
             }
+            console.log(`Why are you looking here, ${username}?\n I know what you did last summer!`); // Funny console log
         });
     }
 
