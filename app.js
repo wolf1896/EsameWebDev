@@ -19,41 +19,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function loadFeaturedRecipes() {
-    const feedback = document.getElementById("searchFeedback");
-    const recipeContainer = document.getElementById("recipeContainer");
+        const feedback = document.getElementById("searchFeedback");
+        const recipeContainer = document.getElementById("recipeContainer");
 
-    // Attempt to fetch external data 
-    fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=Seafood`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            const featuredMeals = data.meals.slice(0, 6);
-            renderRecipes(featuredMeals, "Featured Seafood Recipes");
-        })
-        .catch(err => {
-            // Log error for debugging, then trigger fallback
-            console.warn("CORS/API Blocked. Loading local fallback data...", err);
-            
-            // --- Fallback Data ---
-            // If the API fails, we manually create a small array to show we handled the error 
-            const fallbackMeals = [
-                {
-                    strMeal: "Baked Salmon (Offline Mode)",
-                    strMealThumb: "https://www.themealdb.com/images/media/meals/1548772327.jpg",
-                    idMeal: "1"
-                },
-                {
-                    strMeal: "Fish Pie (Offline Mode)",
-                    strMealThumb: "https://www.themealdb.com/images/media/meals/ysqupp1511640538.jpg",
-                    idMeal: "2"
-                }
-            ];
-            
-            feedback.textContent = "Notice: API currently unavailable. Loading saved favorites.";
-            renderRecipes(fallbackMeals, "Featured Recipes (Cached)");
-        });
+        // Attempt to fetch external data 
+        fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=Arrabiata`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                const featuredMeals = data.meals.slice(0, 6);
+                renderRecipes(featuredMeals, "Featured Seafood Recipes");
+            })
+            .catch(err => {
+                // Log error for debugging, then trigger fallback
+                console.warn("CORS/API Blocked. Loading local fallback data...", err);
+                
+                // --- Fallback Data ---
+                // If the API fails, we manually create a small array to show we handled the error 
+                const fallbackMeals = [
+                    {
+                        strMeal: "Baked Salmon (Offline Mode)",
+                        strMealThumb: "https://www.themealdb.com/images/media/meals/1548772327.jpg",
+                        idMeal: "1"
+                    },
+                    {
+                        strMeal: "Fish Pie (Offline Mode)",
+                        strMealThumb: "https://www.themealdb.com/images/media/meals/ysqupp1511640538.jpg",
+                        idMeal: "2"
+                    }
+                ];
+                
+                feedback.textContent = "Notice: API currently unavailable. Loading saved favorites.";
+                renderRecipes(fallbackMeals, "Featured Recipes (Cached)");
+            });
 }
 
     // --- 3. Helper Function to Render Recipe Cards ---
