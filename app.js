@@ -361,4 +361,108 @@ document.addEventListener("DOMContentLoaded", () => {
         // Run on page load
         displayPlanner();
     }
+
+    // --- 8. Discover Page Logic ---
+    if (window.location.pathname.includes("discover.html")) {
+        // Route Protection
+        if (!isLoggedIn) {
+            window.location.href = "login.html";
+        }
+
+        const searchInput = document.getElementById("searchInput");
+        const searchType = document.getElementById("searchType");
+        const searchBtn = document.getElementById("searchBtn");
+        const discoverContainer = document.getElementById("discoverContainer");
+        const discoverFeedback = document.getElementById("discoverFeedback");
+
+        // 1. Create a reusable function to fetch and display recipes
+        function loadRecipes(query = "", type = "name") {
+            discoverFeedback.style.color = "var(--text-dark)";
+            // Change feedback text depending on if it's the initial load or a specific search
+            discoverFeedback.textContent = query === "" ? "Loading all available recipes..." : "Searching culinary database...";
+            discoverContainer.innerHTML = "";
+
+            let apiUrl = `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`;
+            
+            if (type === "ingredient" && query !== "") {
+                apiUrl = `https://www.themealdb.com/api/json/v1/1/filter.php?i=${query}`;
+            }
+
+            fetch(apiUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error("Network issues encountered.");
+                    return res.json();
+                })
+                .then(data => {
+                    if (!data.meals) {
+                        discoverFeedback.style.color = "#ff6b6b";
+                        discoverFeedback.textContent = query === "" 
+                            ? "No recipes currently available in the database." 
+                            : `No recipes found matching "${query}". Try another word!`;
+                        return;
+                    }
+
+                    // Sort the fetched meals alphabetically by their name (strMeal)
+                    const sortedMeals = data.meals.sort((a, b) => a.strMeal.localeCompare(b.strMeal));
+
+                    discoverFeedback.textContent = query === "" 
+                        ? `Browse our collection of ${sortedMeals.length} recipes:`
+                        : `Found ${sortedMeals.length} results for "${query}":`;
+                    
+                    sortedMeals.forEach(meal => {
+                        const card = document.createElement("div");
+                        card.classList.add("recipe-item");
+
+                        card.innerHTML = `
+                            <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+                            <div class="recipe-info">
+                                <h3>${meal.strMeal}</h3>
+                                <button class="btn save-btn" style="margin-top: 10px; width: 100%;">Add to Planner</button>
+                            </div>
+                        `;
+
+                        card.querySelector(".save-btn").addEventListener("click", () => {
+                            let currentPlanner = JSON.parse(localStorage.getItem("mealPlanner")) || [];
+                            const exists = currentPlanner.some(item => item.idMeal === meal.idMeal);
+                            
+                            if (!exists) {
+                                currentPlanner.push({
+                                    idMeal: meal.idMeal,
+                                    strMeal: meal.strMeal,
+                                    strMealThumb: meal.strMealThumb
+                                });
+                                localStorage.setItem("mealPlanner", JSON.stringify(currentPlanner));
+                                alert(`"${meal.strMeal}" successfully added to your Weekly Planner!`);
+                            } else {
+                                alert(`"${meal.strMeal}" is already inside your planner.`);
+                            }
+                        });
+
+                        discoverContainer.appendChild(card);
+                    });
+                })
+                .catch(err => {
+                    discoverFeedback.style.color = "#ff6b6b";
+                    discoverFeedback.textContent = "Unable to connect to service. Verify internet configurations.";
+                    console.error("API error details:", err);
+                });
+        }
+
+        // 2. Initial Page Load: Call the function immediately with no search word to load everything
+        loadRecipes();
+
+        // 3. User Search: Call the function only when the button is clicked with their specific word
+        searchBtn.addEventListener("click", () => {
+            const query = searchInput.value.trim();
+            const type = searchType.value;
+
+            if (query === "") {
+                // If they clear the search box and click search, just reload all default recipes
+                loadRecipes();
+            } else {
+                // Otherwise, search for what they typed
+                loadRecipes(query, type);
+            }
+        });
+    }
 });
