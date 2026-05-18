@@ -383,7 +383,7 @@ document.addEventListener("DOMContentLoaded", () => {
             discoverContainer.innerHTML = "";
 
             let apiUrl = `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`;
-            
+
             if (type === "ingredient" && query !== "") {
                 apiUrl = `https://www.themealdb.com/api/json/v1/1/filter.php?i=${query}`;
             }
