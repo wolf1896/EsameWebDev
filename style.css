@@ -168,6 +168,20 @@ input, select {
     border-radius: 4px;
 }
 
+.recipe-instructions {
+    max-height: 120px;
+    overflow-y: auto;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    padding: 10px;
+    border-radius: 4px;
+    
+    /* These variables will now change automatically based on the body class */
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    border: 1px solid var(--border-color);
+}
+
 /* --- Profile Page Flexbox Layout --- */
 .profile-layout {
     display: flex;

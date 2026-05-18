@@ -233,7 +233,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- 7. Planner Page Logic ---
-    // --- 7. Planner Page Logic ---
     if (window.location.pathname.includes("planner.html")) {
         if (!isLoggedIn) {
             window.location.href = "login.html";
@@ -327,7 +326,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                         ${elementsArray.join("")}
                                     </ul>
                                     <h4 style="margin-bottom: 5px; color: var(--primary-color);">Instructions:</h4>
-                                    <p style="max-height: 120px; overflow-y: auto; font-size: 0.8rem; line-height: 1.4; background: #f9f9f9; padding: 5px; border-radius: 4px;">
+                                    
+                                    <p class="recipe-instructions">
                                         ${recipeInfo.strInstructions}
                                     </p>
                                 `;
@@ -358,21 +358,5 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         }
-
-        displayPlanner();
     }
-
-        // Handle Clear All Button
-        if (clearAllBtn) {
-            clearAllBtn.addEventListener("click", () => {
-                if (confirm("Are you sure you want to clear your entire weekly meal plan?")) {
-                    localStorage.removeItem("mealPlanner");
-                    displayPlanner(); // Refresh UI
-                }
-            });
-        }
-
-        // Run on page load
-        displayPlanner();
-    }
-);
+});
