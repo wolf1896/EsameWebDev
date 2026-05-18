@@ -114,6 +114,7 @@ input {
     flex-wrap: wrap;
     gap: 20px;
     margin-top: 20px;
+    align-items: flex-start;
 }
 
 .recipe-item {
@@ -172,6 +173,18 @@ select:focus, input:focus {
 .btn-outline:hover {
     background-color: var(--primary-color);
     color: var(--text-light);
+}
+
+/* Custom smooth scrollbar styling for recipe directions text container boxes */
+.recipe-details p::-webkit-scrollbar {
+    width: 4px;
+}
+.recipe-details p::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+.recipe-details ul {
+    list-style-type: square;
 }
 
 /* --- Media Queries  --- */

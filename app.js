@@ -79,20 +79,20 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
 
             recipeCard.querySelector(".save-btn").addEventListener("click", () => {
-                // Get existing planner items or initialize empty array
                 let currentPlanner = JSON.parse(localStorage.getItem("mealPlanner")) || [];
                 
-                // Prevent duplicate additions
-                const exists = currentPlanner.some(item => item.strMeal === meal.strMeal);
+                const exists = currentPlanner.some(item => item.idMeal === meal.idMeal);
                 if (!exists) {
+                    // CRITICAL: We now explicitly save the idMeal alongside the other properties
                     currentPlanner.push({
+                        idMeal: meal.idMeal,
                         strMeal: meal.strMeal,
                         strMealThumb: meal.strMealThumb
                     });
                     localStorage.setItem("mealPlanner", JSON.stringify(currentPlanner));
-                    alert(`${meal.strMeal} has been added to your Meal Planner!`); // Feedback
+                    alert(`${meal.strMeal} has been added to your Meal Planner!`);
                 } else {
-                    alert(`${meal.strMeal} is already in your planner.`); // Feedback
+                    alert(`${meal.strMeal} is already in your planner.`);
                 }
             });
 
@@ -213,8 +213,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- 7. Planner Page Logic ---
+    // --- 7. Planner Page Logic ---
     if (window.location.pathname.includes("planner.html")) {
-        // Route Protection
         if (!isLoggedIn) {
             window.location.href = "login.html";
         }
@@ -226,7 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
         function displayPlanner() {
             let currentPlanner = JSON.parse(localStorage.getItem("mealPlanner")) || [];
 
-            // Provide User Feedback if the layout is empty
             if (currentPlanner.length === 0) {
                 plannerFeedback.textContent = "Your planner is empty! Go to the Home page to discover and add recipes.";
                 plannerContainer.innerHTML = "";
@@ -236,34 +235,112 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (clearAllBtn) clearAllBtn.style.display = "inline-block";
             plannerFeedback.textContent = "";
-            plannerContainer.innerHTML = ""; // Reset current elements
+            plannerContainer.innerHTML = ""; 
 
-            // Dynamically build and add elements to the DOM
             currentPlanner.forEach((meal, index) => {
                 const plannerCard = document.createElement("div");
                 plannerCard.classList.add("recipe-item");
 
+                // Layout with an added layout divider, a view details button, and a hidden details display element
                 plannerCard.innerHTML = `
                     <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
                     <div class="recipe-info">
                         <h3>${meal.strMeal}</h3>
-                        <button class="btn delete-btn" style="background-color: #e74c3c; margin-top: 10px;">Remove</button>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button class="btn view-btn" style="background-color: #3498db; flex: 1;">Ingredients</button>
+                            <button class="btn delete-btn" style="background-color: #e74c3c; flex: 1;">Remove</button>
+                        </div>
+                        <div class="recipe-details" style="display: none; margin-top: 15px; text-align: left; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 10px;">
+                            <p style="color: #7f8c8d;">Loading content details...</p>
+                        </div>
                     </div>
                 `;
 
-                // Dynamic Element Modification
+                const viewBtn = plannerCard.querySelector(".view-btn");
+                const detailsDiv = plannerCard.querySelector(".recipe-details");
+
+                // Interactive Dynamic Element Toggle Listener
+                viewBtn.addEventListener("click", () => {
+                    // If the text wrapper element is visible, close it
+                    if (detailsDiv.style.display === "block") {
+                        detailsDiv.style.display = "none";
+                        viewBtn.textContent = "Ingredients";
+                        return;
+                    }
+
+                    // Show the menu compartment container layout
+                    detailsDiv.style.display = "block";
+                    viewBtn.textContent = "Hide Details";
+
+                    // Handle cached/offline mode values safely
+                    if (meal.idMeal === "1" || meal.idMeal === "2") {
+                        detailsDiv.innerHTML = `
+                            <strong style="color: var(--primary-color);">Ingredients:</strong>
+                            <p>• Fresh Salmon filet / Fish selection<br>• Olive Oil & Mixed Table Herbs</p>
+                            <strong style="color: var(--primary-color); display:block; margin-top:5px;">Instructions:</strong>
+                            <p>Bake components uniformly in hot oven at 180°C until internal temperature metrics cook clean.</p>
+                        `;
+                        return;
+                    }
+
+                    // Query search full database detail elements matching unique internal tracking key
+                    fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.meals && data.meals[0]) {
+                                const recipeInfo = data.meals[0];
+                                
+                                // Assemble list items by iterating through API parameters properties
+                                let elementsArray = [];
+                                for (let i = 1; i <= 20; i++) {
+                                    const ingredient = recipeInfo[`strIngredient${i}`];
+                                    const measure = recipeInfo[`strMeasure${i}`];
+                                    if (ingredient && ingredient.trim() !== "") {
+                                        elementsArray.push(`<li>${measure ? measure : ""} ${ingredient}</li>`);
+                                    }
+                                }
+
+                                // Construct HTML content inside card compartment block dynamically
+                                detailsDiv.innerHTML = `
+                                    <h4 style="margin-bottom: 5px; color: var(--primary-color);">Ingredients:</h4>
+                                    <ul style="padding-left: 20px; margin-bottom: 10px; font-size: 0.85rem;">
+                                        ${elementsArray.join("")}
+                                    </ul>
+                                    <h4 style="margin-bottom: 5px; color: var(--primary-color);">Instructions:</h4>
+                                    <p style="max-height: 120px; overflow-y: auto; font-size: 0.8rem; line-height: 1.4; background: #f9f9f9; padding: 5px; border-radius: 4px;">
+                                        ${recipeInfo.strInstructions}
+                                    </p>
+                                `;
+                            }
+                        })
+                        .catch(err => {
+                            detailsDiv.innerHTML = "<p style='color: #e74c3c;'>Error gathering instructions details.</p>";
+                            console.error(err);
+                        });
+                });
+
+                // Remove structural element button selector
                 plannerCard.querySelector(".delete-btn").addEventListener("click", () => {
-                    // Remove from array array
                     currentPlanner.splice(index, 1);
-                    // Update storage
                     localStorage.setItem("mealPlanner", JSON.stringify(currentPlanner));
-                    // Re-render UI to update DOM immediately
-                    displayPlanner();
+                    displayPlanner(); 
                 });
 
                 plannerContainer.appendChild(plannerCard);
             });
         }
+
+        if (clearAllBtn) {
+            clearAllBtn.addEventListener("click", () => {
+                if (confirm("Are you sure you want to clear your entire weekly meal plan?")) {
+                    localStorage.removeItem("mealPlanner");
+                    displayPlanner(); 
+                }
+            });
+        }
+
+        displayPlanner();
+    }
 
         // Handle Clear All Button
         if (clearAllBtn) {
@@ -278,4 +355,4 @@ document.addEventListener("DOMContentLoaded", () => {
         // Run on page load
         displayPlanner();
     }
-});
+);
