@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover new recipes and plan your meals.">
-    <title>Home - Recipe App</title>
+    <meta name="description" content="Manage your Recipe App user profile and dietary preferences.">
+    <title>User Profile - Recipe App</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,17 +21,36 @@
     </header>
 
     <main class="container">
-        <section class="search-section">
-            <h2>Find a Recipe</h2>
-            <form id="searchForm">
-                <input type="text" id="searchInput" placeholder="Search for a meal (e.g., chicken)..." required>
-                <button type="submit" class="btn">Search</button>
-            </form>
-            <p id="searchFeedback" class="feedback"></p>
-        </section>
-
-        <section id="recipeContainer" class="recipe-grid">
+        <div class="profile-layout">
+            <section class="card profile-card">
+                <h2>Your Profile</h2>
+                <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+                <p><strong>Username:</strong> <span id="displayUsername">Loading...</span></p>
+                <p><strong>Email:</strong> <span id="displayEmail">Not set</span></p>
+                <p><strong>Dietary Preference:</strong> <span id="displayDiet">None Specified</span></p>
             </section>
+
+            <section class="card profile-form-card">
+                <h3>Update Profile Details</h3>
+                <form id="profileForm" novalidate>
+                    <div class="form-group">
+                        <label for="editEmail">Email Address</label>
+                        <input type="email" id="editEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDiet">Dietary Preference</label>
+                        <select id="editDiet" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="None Specified">No Restrictions</option>
+                            <option value="Vegetarian">Vegetarian</option>
+                            <option value="Vegan">Vegan</option>
+                            <option value="Gluten-Free">Gluten-Free</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Save Changes</button>
+                    <p id="profileFeedback" class="feedback"></p>
+                </form>
+            </section>
+        </div>
     </main>
 
     <script src="app.js"></script>
