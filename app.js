@@ -358,5 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         }
+        // Run on page load
+        displayPlanner();
     }
 });
