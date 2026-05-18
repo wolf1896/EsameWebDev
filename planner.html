@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover new recipes and plan your meals.">
-    <title>Home - Recipe App</title>
+    <meta name="description" content="View and manage your weekly meal plan.">
+    <title>Meal Planner - Recipe App</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍲</text></svg>">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,21 +17,23 @@
                 <li><a href="planner.html">Planner</a></li>
                 <li><a href="profile.html">Profile</a></li>
             </ul>
-            <button id="logoutBtn" class="btn btn-outline">Logout</button>
+            <div>
+                <button id="themeToggleBtn" class="btn btn-outline" style="margin-right: 10px;">🌓 Theme</button>
+                <button id="logoutBtn" class="btn btn-outline">Logout</button>
+            </div>
         </nav>
     </header>
 
     <main class="container">
-        <section class="search-section">
-            <h2>Find a Recipe</h2>
-            <form id="searchForm">
-                <input type="text" id="searchInput" placeholder="Search for a meal (e.g., chicken)..." required>
-                <button type="submit" class="btn">Search</button>
-            </form>
-            <p id="searchFeedback" class="feedback"></p>
+        <section class="planner-header">
+            <h2>Your Saved Meal Plan</h2>
+            <p>Review the recipes you have selected for your week. You can remove items as your plans change.</p>
+            <button id="clearAllBtn" class="btn btn-outline" style="margin-top: 10px;">Clear Entire Plan</button>
         </section>
 
-        <section id="recipeContainer" class="recipe-grid">
+        <p id="plannerFeedback" class="feedback" style="text-align: center; font-size: 1.2rem; margin-top: 20px;"></p>
+
+        <section id="plannerContainer" class="recipe-grid">
             </section>
     </main>
 
