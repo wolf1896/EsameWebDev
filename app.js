@@ -6,6 +6,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     const recipeContainer = document.getElementById("recipeContainer");
     const searchForm = document.getElementById("searchForm");
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    const currentTheme = localStorage.getItem("theme");
+    
+    if (currentTheme === "dark") {
+            document.body.classList.add("dark-theme");
+    }
+
+    // Event listener for theme switching interactions
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("dark-theme");
+            
+            // Store choice globally
+            if (document.body.classList.contains("dark-theme")) {
+                localStorage.setItem("theme", "dark");
+            } else {
+                localStorage.setItem("theme", "light");
+            }
+        });
+    }
 
     // Route Protection
     if (window.location.pathname.includes("index.html") && !isLoggedIn) {
