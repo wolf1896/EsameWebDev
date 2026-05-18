@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
     // --- 3. Helper Function to Render Recipe Cards ---
-    // This handles the dynamic DOM creation required by your project 
+    // This handles the dynamic DOM creation and event binding for both API and fallback data
     function renderRecipes(meals, titleText) {
         if (!recipeContainer) return;
 
@@ -78,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             `;
 
-            // UPDATE THIS EVENT LISTENER: Saves to localStorage
             recipeCard.querySelector(".save-btn").addEventListener("click", () => {
                 // Get existing planner items or initialize empty array
                 let currentPlanner = JSON.parse(localStorage.getItem("mealPlanner")) || [];
@@ -196,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Simulated Submission (Print data in terminal/console as per guidelines)
+            // Simulated Submission
             console.log(`Simulated Data Submit -> Email: ${emailInput}, Diet: ${dietInput}`);
 
             // Persist the verified updates locally
@@ -252,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                 `;
 
-                // Interactive Dynamic Element Modification (Removing Elements)
+                // Dynamic Element Modification
                 plannerCard.querySelector(".delete-btn").addEventListener("click", () => {
                     // Remove from array array
                     currentPlanner.splice(index, 1);
