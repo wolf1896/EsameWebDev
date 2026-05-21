@@ -34,47 +34,71 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- 2. Initialization: Load Featured Recipes ---
     // This ensures the page is not empty at the start [cite: 9, 22]
-    if (window.location.pathname.includes("index.html") || window.location.pathname === "/") {
-        loadFeaturedRecipes();
-    }
+    if (window.location.pathname.includes("index.html") || window.location.pathname === "/" || window.location.pathname.endsWith("/")) {
+        if (!isLoggedIn) {
+            window.location.href = "login.html";
+        }
 
-    function loadFeaturedRecipes() {
-        const feedback = document.getElementById("searchFeedback");
-        const recipeContainer = document.getElementById("recipeContainer");
+        // Fulfill dynamic user greeting criteria
+        const welcomeGreeting = document.getElementById("welcomeGreeting");
+        const statsPlannerCount = document.getElementById("statsPlannerCount");
+        const featuredRecipeContainer = document.getElementById("featuredRecipeContainer");
 
-        // Attempt to fetch external data 
-        fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=Arrabiata`)
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
+        const savedProfile = JSON.parse(localStorage.getItem("userProfile")) || { name: "Chef User" };
+        const currentPlanner = JSON.parse(localStorage.getItem("mealPlanner")) || [];
+
+        if (welcomeGreeting) welcomeGreeting.textContent = `Welcome back, ${savedProfile.name}!`;
+        if (statsPlannerCount) statsPlannerCount.textContent = `${currentPlanner.length} Saved Dishes`;
+
+        // Async operation fetching a single random recipe block layout
+        fetch("https://www.themealdb.com/api/json/v1/1/random.php")
+            .then(res => res.json())
             .then(data => {
-                const featuredMeals = data.meals.slice(0, 6);
-                renderRecipes(featuredMeals, `${featuredMeals[0].strMeal}`);
+                if (data.meals && data.meals[0] && featuredRecipeContainer) {
+                    const meal = data.meals[0];
+                    
+                    // Render an extra premium card presentation block layout
+                    featuredRecipeContainer.innerHTML = `
+                        <div class="recipe-item" style="width: 100%; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column;">
+                            <img src="${meal.strMealThumb}" alt="${meal.strMeal}" style="height: 250px; object-fit: cover;">
+                            <div class="recipe-info" style="text-align: center;">
+                                <span style="background: var(--primary-color); color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">${meal.strCategory || "Featured"}</span>
+                                <h3 style="margin: 10px 0 5px 0;">${meal.strMeal}</h3>
+                                <p style="font-size: 0.85rem; color: #7f8c8d; margin-bottom: 15px;">Origin: ${meal.strArea || "International"}</p>
+                                <button id="addFeaturedBtn" class="btn" style="width: 100%;">Add to Weekly Planner</button>
+                            </div>
+                        </div>
+                    `;
+
+                    // Handle interactive click tracking integration
+                    document.getElementById("addFeaturedBtn").addEventListener("click", () => {
+                        let currentPlannerList = JSON.parse(localStorage.getItem("mealPlanner")) || [];
+                        const exists = currentPlannerList.some(item => item.idMeal === meal.idMeal);
+
+                        if (!exists) {
+                            currentPlannerList.push({
+                                idMeal: meal.idMeal,
+                                strMeal: meal.strMeal,
+                                strMealThumb: meal.strMealThumb
+                            });
+                            localStorage.setItem("mealPlanner", JSON.stringify(currentPlannerList));
+                            
+                            // Live update counter metric instantly
+                            if (statsPlannerCount) statsPlannerCount.textContent = `${currentPlannerList.length} Saved Dishes`;
+                            alert(`"${meal.strMeal}" successfully appended to your planner!`);
+                        } else {
+                            alert(`"${meal.strMeal}" is already inside your planner layout arrays.`);
+                        }
+                    });
+                }
             })
             .catch(err => {
-                // Log error for debugging, then trigger fallback
-                console.warn("CORS/API Blocked. Loading local fallback data...", err);
-                
-                // --- Fallback Data ---
-                // If the API fails, we manually create a small array to show we handled the error 
-                const fallbackMeals = [
-                    {
-                        strMeal: "Baked Salmon (Offline Mode)",
-                        strMealThumb: "https://www.themealdb.com/images/media/meals/1548772327.jpg",
-                        idMeal: "1"
-                    },
-                    {
-                        strMeal: "Fish Pie (Offline Mode)",
-                        strMealThumb: "https://www.themealdb.com/images/media/meals/ysqupp1511640538.jpg",
-                        idMeal: "2"
-                    }
-                ];
-                
-                feedback.textContent = "Notice: API currently unavailable. Loading saved favorites.";
-                renderRecipes(fallbackMeals, "Featured Recipes (Cached)");
+                if (featuredRecipeContainer) {
+                    featuredRecipeContainer.innerHTML = "<p style='color: #e74c3c; text-align: center;'>Unable to load recommendation recommendation matrix.</p>";
+                }
+                console.error(err);
             });
-}
+    }
 
     // --- 3. Helper Function to Render Recipe Cards ---
     // This handles the dynamic DOM creation and event binding for both API and fallback data
@@ -364,7 +388,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- 8. Discover Page Logic ---
     if (window.location.pathname.includes("discover.html")) {
-        // Route Protection
         if (!isLoggedIn) {
             window.location.href = "login.html";
         }
@@ -375,40 +398,34 @@ document.addEventListener("DOMContentLoaded", () => {
         const discoverContainer = document.getElementById("discoverContainer");
         const discoverFeedback = document.getElementById("discoverFeedback");
 
-        // 1. Create a reusable function to fetch and display recipes
         function loadRecipes(query = "", type = "name") {
+            if (!discoverFeedback || !discoverContainer) return;
+
             discoverFeedback.style.color = "var(--text-dark)";
-            // Change feedback text depending on if it's the initial load or a specific search
-            discoverFeedback.textContent = query === "" ? "Loading all available recipes..." : "Searching culinary database...";
+            discoverFeedback.textContent = query === "" ? "Loading all registry files..." : "Searching culinary database...";
             discoverContainer.innerHTML = "";
 
             let apiUrl = `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`;
-
             if (type === "ingredient" && query !== "") {
                 apiUrl = `https://www.themealdb.com/api/json/v1/1/filter.php?i=${query}`;
             }
 
             fetch(apiUrl)
-                .then(res => {
-                    if (!res.ok) throw new Error("Network issues encountered.");
-                    return res.json();
-                })
+                .then(res => res.json())
                 .then(data => {
                     if (!data.meals) {
                         discoverFeedback.style.color = "#ff6b6b";
-                        discoverFeedback.textContent = query === "" 
-                            ? "No recipes currently available in the database." 
-                            : `No recipes found matching "${query}". Try another word!`;
+                        discoverFeedback.textContent = `No matches found for "${query}". Try another term!`;
                         return;
                     }
 
-                    // Sort the fetched meals alphabetically by their name (strMeal)
+                    // Strict alphabetical sorting sorting metric rule configuration
                     const sortedMeals = data.meals.sort((a, b) => a.strMeal.localeCompare(b.strMeal));
 
                     discoverFeedback.textContent = query === "" 
-                        ? `Browse our collection of ${sortedMeals.length} recipes:`
-                        : `Found ${sortedMeals.length} results for "${query}":`;
-                    
+                        ? `Browse our comprehensive collection of ${sortedMeals.length} recipes:`
+                        : `Found ${sortedMeals.length} records matching your metrics:`;
+
                     sortedMeals.forEach(meal => {
                         const card = document.createElement("div");
                         card.classList.add("recipe-item");
@@ -422,19 +439,19 @@ document.addEventListener("DOMContentLoaded", () => {
                         `;
 
                         card.querySelector(".save-btn").addEventListener("click", () => {
-                            let currentPlanner = JSON.parse(localStorage.getItem("mealPlanner")) || [];
-                            const exists = currentPlanner.some(item => item.idMeal === meal.idMeal);
-                            
+                            let currentPlannerList = JSON.parse(localStorage.getItem("mealPlanner")) || [];
+                            const exists = currentPlannerList.some(item => item.idMeal === meal.idMeal);
+
                             if (!exists) {
-                                currentPlanner.push({
+                                currentPlannerList.push({
                                     idMeal: meal.idMeal,
                                     strMeal: meal.strMeal,
                                     strMealThumb: meal.strMealThumb
                                 });
-                                localStorage.setItem("mealPlanner", JSON.stringify(currentPlanner));
-                                alert(`"${meal.strMeal}" successfully added to your Weekly Planner!`);
+                                localStorage.setItem("mealPlanner", JSON.stringify(currentPlannerList));
+                                alert(`"${meal.strMeal}" successfully cataloged into your planner!`);
                             } else {
-                                alert(`"${meal.strMeal}" is already inside your planner.`);
+                                alert(`"${meal.strMeal}" is already active in your system parameters.`);
                             }
                         });
 
@@ -443,26 +460,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
                 .catch(err => {
                     discoverFeedback.style.color = "#ff6b6b";
-                    discoverFeedback.textContent = "Unable to connect to service. Verify internet configurations.";
-                    console.error("API error details:", err);
+                    discoverFeedback.textContent = "Error pulling database arrays.";
+                    console.error(err);
                 });
         }
 
-        // 2. Initial Page Load: Call the function immediately with no search word to load everything
+        // Default boot state: Load everything sorted alphabetically on initialization
         loadRecipes();
 
-        // 3. User Search: Call the function only when the button is clicked with their specific word
-        searchBtn.addEventListener("click", () => {
-            const query = searchInput.value.trim();
-            const type = searchType.value;
-
-            if (query === "") {
-                // If they clear the search box and click search, just reload all default recipes
-                loadRecipes();
-            } else {
-                // Otherwise, search for what they typed
-                loadRecipes(query, type);
-            }
-        });
+        if (searchBtn) {
+            searchBtn.addEventListener("click", () => {
+                const query = searchInput.value.trim();
+                const type = searchType.value;
+                loadRecipes(query, query === "" ? "name" : type);
+            });
+        }
     }
 });
