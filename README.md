@@ -55,4 +55,10 @@ To comfortably satisfy the exam criteria requiring at least four structural page
 ## How to Run the Application
 1. Download or clone this repository to your local directory setup.
 2. Unzip the project folder if downloaded as a compressed `.zip` archive package.
-3. Open the workspace root using a development local server module (e.g., VS
+3. Open the workspace root using a development local server module (e.g., VS Code **Live Server** extension) to ensure valid route pathways.
+4. Open the `login.html` dashboard view.
+5. Provide a valid mockup testing username (min. 3 characters) and password (min. 6 characters) to access the application loop.
+6. Use the top navigation header bar to experience the responsive page layouts and live theme toggles.
+
+## Author
+* **Mattia Lupo** — Web Development Student (EPICODE)
