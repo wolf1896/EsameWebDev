@@ -152,6 +152,7 @@ input, select {
     gap: 20px;
     margin-top: 20px;
     align-items: flex-start;
+    justify-content: center;
 }
 
 .recipe-item {

@@ -284,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const plannerCard = document.createElement("div");
                 plannerCard.classList.add("recipe-item");
 
-                // Layout with an added layout divider, a view details button, and a hidden details display element
+                // Injected a full-width green "Download PDF" button button element layout
                 plannerCard.innerHTML = `
                     <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
                     <div class="recipe-info">
@@ -293,29 +293,29 @@ document.addEventListener("DOMContentLoaded", () => {
                             <button class="btn view-btn" style="background-color: #3498db; flex: 1;">Ingredients</button>
                             <button class="btn delete-btn" style="background-color: #e74c3c; flex: 1;">Remove</button>
                         </div>
+                        <button class="btn download-btn" style="background-color: #27ae60; color: white; width: 100%; margin-top: 10px;">📄 Download PDF</button>
+                        
                         <div class="recipe-details" style="display: none; margin-top: 15px; text-align: left; font-size: 0.9rem; border-top: 1px solid #eee; padding-top: 10px;">
                             <p style="color: #7f8c8d;">Loading content details...</p>
                         </div>
                     </div>
                 `;
-
+                
                 const viewBtn = plannerCard.querySelector(".view-btn");
+                const downloadBtn = plannerCard.querySelector(".download-btn");
                 const detailsDiv = plannerCard.querySelector(".recipe-details");
 
                 // Interactive Dynamic Element Toggle Listener
                 viewBtn.addEventListener("click", () => {
-                    // If the text wrapper element is visible, close it
                     if (detailsDiv.style.display === "block") {
                         detailsDiv.style.display = "none";
                         viewBtn.textContent = "Ingredients";
                         return;
                     }
 
-                    // Show the menu compartment container layout
                     detailsDiv.style.display = "block";
                     viewBtn.textContent = "Hide Details";
 
-                    // Handle cached/offline mode values safely
                     if (meal.idMeal === "1" || meal.idMeal === "2") {
                         detailsDiv.innerHTML = `
                             <strong style="color: var(--primary-color);">Ingredients:</strong>
@@ -326,14 +326,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     }
 
-                    // Query search full database detail elements matching unique internal tracking key
                     fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`)
                         .then(res => res.json())
                         .then(data => {
                             if (data.meals && data.meals[0]) {
                                 const recipeInfo = data.meals[0];
-                                
-                                // Assemble list items by iterating through API parameters properties
                                 let elementsArray = [];
                                 for (let i = 1; i <= 20; i++) {
                                     const ingredient = recipeInfo[`strIngredient${i}`];
@@ -343,14 +340,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                     }
                                 }
 
-                                // Construct HTML content inside card compartment block dynamically
                                 detailsDiv.innerHTML = `
                                     <h4 style="margin-bottom: 5px; color: var(--primary-color);">Ingredients:</h4>
                                     <ul style="padding-left: 20px; margin-bottom: 10px; font-size: 0.85rem;">
                                         ${elementsArray.join("")}
                                     </ul>
                                     <h4 style="margin-bottom: 5px; color: var(--primary-color);">Instructions:</h4>
-                                    
                                     <p class="recipe-instructions">
                                         ${recipeInfo.strInstructions}
                                     </p>
@@ -360,6 +355,105 @@ document.addEventListener("DOMContentLoaded", () => {
                         .catch(err => {
                             detailsDiv.innerHTML = "<p style='color: #e74c3c;'>Error gathering instructions details.</p>";
                             console.error(err);
+                        });
+                });
+
+                // --- Client Side PDF Export Operation (Clean Page Print) ---
+                downloadBtn.addEventListener("click", () => {
+                    // Helper function to build a dedicated print page layout and compile it
+                    const printCleanRecipePDF = (recipeInfo) => {
+                        // 1. Gather the formatted ingredients list properties
+                        let ingredientsListHTML = "";
+                        for (let i = 1; i <= 20; i++) {
+                            const ingredient = recipeInfo[`strIngredient${i}`];
+                            const measure = recipeInfo[`strMeasure${i}`];
+                            if (ingredient && ingredient.trim() !== "") {
+                                ingredientsListHTML += `<li style="margin-bottom: 5px;">${measure ? measure : ""} ${ingredient}</li>`;
+                            }
+                        }
+
+                        // 2. Build a beautifully isolated, styled document layout in memory
+                        const printWorkerElement = document.createElement("div");
+                        printWorkerElement.innerHTML = `
+                            <div style="padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; max-width: 800px; margin: 0 auto;">
+                                <div style="text-align: center; border-bottom: 2px solid var(--primary-color, #e67e22); padding-bottom: 15px; margin-bottom: 30px;">
+                                    <h1 style="margin: 0; color: #2c3e50; font-size: 2.2rem;">${recipeInfo.strMeal}</h1>
+                                    <p style="margin: 5px 0 0 0; color: #7f8c8d; font-style: italic; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;">
+                                        Category: ${recipeInfo.strCategory || "General"} | Origin: ${recipeInfo.strArea || "International"}
+                                    </p>
+                                </div>
+
+                                <div style="display: flex; gap: 30px; margin-bottom: 30px; align-items: flex-start;">
+                                    <img src="${recipeInfo.strMealThumb}" alt="${recipeInfo.strMeal}" style="width: 250px; height: 250px; object-fit: cover; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                    <div style="flex: 1;">
+                                        <h3 style="margin-top: 0; color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Ingredients Required</h3>
+                                        <ul style="padding-left: 20px; font-size: 0.95rem;">
+                                            ${ingredientsListHTML}
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 20px;">
+                                    <h3 style="color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Preparation Instructions</h3>
+                                    <p style="white-space: pre-line; font-size: 0.95rem; text-align: justify; color: #34495e;">
+                                        ${recipeInfo.strInstructions}
+                                    </p>
+                                </div>
+
+                                <div style="margin-top: 50px; text-align: center; border-top: 1px solid #eee; padding-top: 15px; font-size: 0.8rem; color: #95a5a6;">
+                                    Generated via RecipeApp Workspace — Final Exam Submission
+                                </div>
+                            </div>
+                        `;
+
+                        // 3. Configure file download settings
+                        const configurationOptions = {
+                            margin:       0.3,
+                            filename:     `${recipeInfo.strMeal.replace(/\s+/g, '_')}_Official_Recipe.pdf`,
+                            image:        { type: 'jpeg', quality: 0.98 },
+                            html2canvas:  { scale: 2, useCORS: true, logging: false },
+                            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                        };
+
+                        // 4. Pass the custom off-screen element right to the printer bundle
+                        html2pdf().set(configurationOptions).from(printWorkerElement).save();
+                    };
+
+                    // Check if it's our mockup default recipe data
+                    if (meal.idMeal === "1" || meal.idMeal === "2") {
+                        const localMockData = {
+                            strMeal: meal.strMeal,
+                            strMealThumb: meal.strMealThumb,
+                            strCategory: "Featured Selection",
+                            strArea: "Healthy",
+                            strIngredient1: "Fresh Salmon filet", strMeasure1: "1 Large",
+                            strIngredient2: "Olive Oil & Mixed Table Herbs", strMeasure2: "To taste",
+                            strInstructions: "Bake components uniformly in a hot oven at 180°C until internal temperature metrics cook clean."
+                        };
+                        printCleanRecipePDF(localMockData);
+                        return;
+                    }
+
+                    // Otherwise fetch live raw details from API and feed it right into our printer setup
+                    downloadBtn.disabled = true;
+                    downloadBtn.textContent = "⌛ Compiling PDF...";
+
+                    fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.meals && data.meals[0]) {
+                                printCleanRecipePDF(data.meals[0]);
+                            } else {
+                                alert("Could not fetch the clean API data for this recipe.");
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert("API connectivity problem occurred while creating PDF.");
+                        })
+                        .finally(() => {
+                            downloadBtn.disabled = false;
+                            downloadBtn.textContent = "📄 Download PDF";
                         });
                 });
 
