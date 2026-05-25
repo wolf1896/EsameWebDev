@@ -211,8 +211,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // Load saved values from localStorage or fallback to defaults
         const currentUsername = localStorage.getItem("username") || "Guest";
         const currentEmail = localStorage.getItem("userEmail") || "hello@example.com";
-        const currentDiet = localStorage.getItem("userDiet") || "None Specified";
-
+        const currentDiet = localStorage.getItem("userDiet") || "No Restrictions";
+        
         // Dynamically manipulate the DOM to display current user details
         displayUsername.textContent = currentUsername;
         displayEmail.textContent = currentEmail;
@@ -375,7 +375,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         // 2. Build a beautifully isolated, styled document layout in memory
                         const printWorkerElement = document.createElement("div");
 
-                        // Explicitly set a standard width so the canvas knows how wide the "paper" is
+                        // Explicitly set a standard width for canvas
                         printWorkerElement.style.width = "800px"; 
                         printWorkerElement.style.padding = "20px";
                         printWorkerElement.style.backgroundColor = "#ffffff"; // Force white background
@@ -426,11 +426,10 @@ document.addEventListener("DOMContentLoaded", () => {
                             pagebreak:    { mode: 'legacy' } 
                         };
 
-                        // 4. Pass the custom off-screen element right to the printer bundle
+                        // 4. Pass the custom off-screen element to the printer bundle
                         html2pdf().set(configurationOptions).from(printWorkerElement).save();
                     };
 
-                    // Check if it's our mockup default recipe data
                     if (meal.idMeal === "1" || meal.idMeal === "2") {
                         const localMockData = {
                             strMeal: meal.strMeal,
@@ -445,7 +444,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     }
 
-                    // Otherwise fetch live raw details from API and feed it right into our printer setup
                     downloadBtn.disabled = true;
                     downloadBtn.textContent = "⌛ Compiling PDF...";
 
@@ -487,7 +485,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
         }
-        // Run on page load
+
         displayPlanner();
     }
 
