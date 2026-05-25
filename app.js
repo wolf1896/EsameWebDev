@@ -374,16 +374,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         // 2. Build a beautifully isolated, styled document layout in memory
                         const printWorkerElement = document.createElement("div");
+
+                        // Explicitly set a standard width so the canvas knows how wide the "paper" is
+                        printWorkerElement.style.width = "800px"; 
+                        printWorkerElement.style.padding = "20px";
+                        printWorkerElement.style.backgroundColor = "#ffffff"; // Force white background
+
                         printWorkerElement.innerHTML = `
-                            <div style="padding: 40px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; max-width: 800px; margin: 0 auto;">
-                                <div style="text-align: center; border-bottom: 2px solid var(--primary-color, #e67e22); padding-bottom: 15px; margin-bottom: 30px;">
+                            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6;">
+                                <div style="text-align: center; border-bottom: 2px solid #e67e22; padding-bottom: 15px; margin-bottom: 30px;">
                                     <h1 style="margin: 0; color: #2c3e50; font-size: 2.2rem;">${recipeInfo.strMeal}</h1>
                                     <p style="margin: 5px 0 0 0; color: #7f8c8d; font-style: italic; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;">
                                         Category: ${recipeInfo.strCategory || "General"} | Origin: ${recipeInfo.strArea || "International"}
                                     </p>
                                 </div>
 
-                                <div style="display: flex; gap: 30px; margin-bottom: 30px; align-items: flex-start;">
+                                <div style="display: flex; gap: 30px; align-items: flex-start;">
                                     <img src="${recipeInfo.strMealThumb}" alt="${recipeInfo.strMeal}" style="width: 250px; height: 250px; object-fit: cover; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                                     <div style="flex: 1;">
                                         <h3 style="margin-top: 0; color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Ingredients Required</h3>
@@ -392,13 +398,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                         </ul>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div style="margin-top: 20px;">
-                                    <h3 style="color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Preparation Instructions</h3>
-                                    <p style="white-space: pre-line; font-size: 0.95rem; text-align: justify; color: #34495e;">
-                                        ${recipeInfo.strInstructions}
-                                    </p>
-                                </div>
+                            <div class="html2pdf__page-break"></div>
+
+                            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; padding-top: 20px;">
+                                <h3 style="color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Preparation Instructions</h3>
+                                <p style="white-space: pre-line; font-size: 0.95rem; text-align: justify; color: #34495e;">
+                                    ${recipeInfo.strInstructions}
+                                </p>
 
                                 <div style="margin-top: 50px; text-align: center; border-top: 1px solid #eee; padding-top: 15px; font-size: 0.8rem; color: #95a5a6;">
                                     Generated via RecipeApp Workspace — Final Exam Submission
@@ -408,11 +416,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         // 3. Configure file download settings
                         const configurationOptions = {
-                            margin:       0.3,
+                            margin:       0.5, // Half-inch margins on all sides
                             filename:     `${recipeInfo.strMeal.replace(/\s+/g, '_')}_Official_Recipe.pdf`,
                             image:        { type: 'jpeg', quality: 0.98 },
-                            html2canvas:  { scale: 2, useCORS: true, logging: false },
-                            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                            // Lowering scale slightly from 2 to 1.5 can help prevent massive file sizes and rendering glitches
+                            html2canvas:  { scale: 1.5, useCORS: true, logging: false },
+                            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' },
+                            // explicitly enable legacy mode so the engine detects the "html2pdf__page-break" class
+                            pagebreak:    { mode: 'legacy' } 
                         };
 
                         // 4. Pass the custom off-screen element right to the printer bundle
