@@ -27,13 +27,92 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Only run this logic if we are on the Home/Index page
+    const birthdayContainer = document.getElementById("birthdaySurpriseContainer");
+    if (birthdayContainer) {
+        checkBirthdaySurprise();
+    }
+    function checkBirthdaySurprise() {
+        // 1. Get the saved DOB from the Profile page
+        const savedDOB = localStorage.getItem("userAge");
+        
+        // If they haven't set an age, exit the function
+        if (!savedDOB) return; 
+
+        // 2. Parse the saved DOB (Format is YYYY-MM-DD)
+        const [savedYear, savedMonth, savedDay] = savedDOB.split("-");
+
+        // 3. Get Today's Date
+        const today = new Date();
+        const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
+        const currentDay = String(today.getDate()).padStart(2, '0');
+
+        // 4. Compare Month and Day
+        if (savedMonth === currentMonth && savedDay === currentDay) {
+            // It's their birthday! Show the container and fetch a cake.
+            document.getElementById("birthdaySurpriseContainer").style.display = "block";
+            fetchRandomCake();
+            console.log("Happy Birthday! Fetching a delicious cake recipe for you! 🎉🎂");
+        }
+    }
+
+    function fetchRandomCake() {
+        const cakeContent = document.getElementById("birthdayCakeContent");
+
+        // Search TheMealDB specifically for "cake"
+        fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=cake')
+            .then(res => res.json())
+            .then(data => {
+                if (data.meals) {
+                    // Pick a random cake from the array of results
+                    const randomIndex = Math.floor(Math.random() * data.meals.length);
+                    const birthdayCake = data.meals[randomIndex];
+
+                    // Inject the cake data into the HTML
+                    cakeContent.innerHTML = `
+                        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: center;">
+                            <img src="${birthdayCake.strMealThumb}" alt="${birthdayCake.strMeal}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="flex: 1; min-width: 200px;">
+                                <h3 style="margin: 0 0 5px 0; color: #2c3e50;">${birthdayCake.strMeal}</h3>
+                                <p style="margin: 0 0 15px 0; font-size: 0.9rem; color: #7f8c8d;">Category: ${birthdayCake.strCategory}</p>
+                                
+                                <button onclick="addCakeToPlanner('${birthdayCake.idMeal}', '${birthdayCake.strMeal.replace(/'/g, "\\'")}', '${birthdayCake.strMealThumb}')" class="btn">
+                                    + Add to Planner
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    cakeContent.innerHTML = "<p>Oops! We couldn't fetch the cake recipe right now.</p>";
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching birthday cake:", err);
+                cakeContent.innerHTML = "<p>API connection issue. Save some room for dessert later!</p>";
+            });
+    }
+
+    // Optional helper function to let them easily add their birthday cake to the planner
+    window.addCakeToPlanner = function(id, title, img) {
+        let currentPlanner = JSON.parse(localStorage.getItem("mealPlanner")) || [];
+        
+        // Prevent adding duplicates
+        if (!currentPlanner.find(meal => meal.idMeal === id)) {
+            currentPlanner.push({ idMeal: id, strMeal: title, strMealThumb: img });
+            localStorage.setItem("mealPlanner", JSON.stringify(currentPlanner));
+            alert("🎂 Birthday Cake added to your Weekly Planner!");
+        } else {
+            alert("You already have this cake in your planner!");
+        }
+    };
+
     // Route Protection
     if (window.location.pathname.includes("index.html") && !isLoggedIn) {
         window.location.href = "login.html";
     }
 
     // --- 2. Initialization: Load Featured Recipes ---
-    // This ensures the page is not empty at the start [cite: 9, 22]
+    // This ensures the page is not empty at the start
     if (window.location.pathname.includes("index.html") || window.location.pathname === "/" || window.location.pathname.endsWith("/")) {
         if (!isLoggedIn) {
             window.location.href = "login.html";
@@ -190,6 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.removeItem("userEmail");
             localStorage.removeItem("userDiet");
             localStorage.removeItem("mealPlanner")
+            localStorage.removeItem("userAge")
             window.location.href = "login.html";
         });
     }

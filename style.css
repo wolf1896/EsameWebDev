@@ -32,27 +32,6 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: var(--card-bg);
-    padding: 15px 30px;
-    box-shadow: 0 2px 5px var(--card-shadow);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.nav-links a {
-    text-decoration: none;
-    color: var(--text-dark);
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-.nav-links a:hover {
-    color: var(--primary-color);
-}
-
 /* --- Layouts --- */
 .container {
     max-width: 1200px;
@@ -239,6 +218,53 @@ select:focus, input:focus {
 }
 .recipe-details ul {
     list-style-type: square;
+}
+
+/* --- Birthday Surprise Widget --- */
+.birthday-container {
+    margin-top: 25px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    width: 100%;            
+    flex-basis: 100%;
+    flex-shrink: 0;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+.birthday-card {
+    width: 100%;
+    max-width: 700px;         
+    text-align: center;
+    border-top: 4px solid #e67e22;
+    background-color: #fffaf6;     
+    box-sizing: border-box;
+}
+
+.birthday-card h2 {
+    color: #e67e22;
+    margin-top: 0;
+    font-size: 2rem;
+}
+
+.birthday-card p {
+    color: #34495e;
+    font-size: 1.1rem;
+}
+
+.birthday-cake-content {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    display: inline-block;
+    text-align: left;
+    width: 100%;
+    max-width: 550px;
+    box-shadow: 0 4px 15px rgba(230, 126, 34, 0.1);
+    border: 1px solid #f9e5d8;
+    margin-top: 15px;
+    box-sizing: border-box;
 }
 
 /* --- Media Queries  --- */
