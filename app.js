@@ -207,20 +207,24 @@ document.addEventListener("DOMContentLoaded", () => {
         const displayDiet = document.getElementById("displayDiet");
         const profileForm = document.getElementById("profileForm");
         const profileFeedback = document.getElementById("profileFeedback");
+        const displayAge = document.getElementById("displayAge");
 
         // Load saved values from localStorage or fallback to defaults
         const currentUsername = localStorage.getItem("username") || "Guest";
         const currentEmail = localStorage.getItem("userEmail") || "hello@example.com";
         const currentDiet = localStorage.getItem("userDiet") || "No Restrictions";
+        const currentAge = localStorage.getItem("userAge") || "Raw Ingredients Only";
         
         // Dynamically manipulate the DOM to display current user details
         displayUsername.textContent = currentUsername;
         displayEmail.textContent = currentEmail;
         displayDiet.textContent = currentDiet;
+        displayAge.textContent = currentAge;
 
         // Pre-fill form inputs for better UX
         document.getElementById("editEmail").value = currentEmail;
         document.getElementById("editDiet").value = currentDiet;
+        document.getElementById("editAge").value = currentAge;
 
         // Form Submission & Validation Handler
         profileForm.addEventListener("submit", (e) => {
@@ -228,6 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             const emailInput = document.getElementById("editEmail").value.trim();
             const dietInput = document.getElementById("editDiet").value;
+            const ageInput = document.getElementById("editAge").value;
 
             // Basic Regex Email Validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -240,15 +245,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             // Simulated Submission
-            console.log(`Simulated Data Submit -> Email: ${emailInput}, Diet: ${dietInput}`);
+            console.log(`Simulated Data Submit -> Email: ${emailInput}, Diet: ${dietInput}, Age: ${ageInput}`);
 
             // Persist the verified updates locally
             localStorage.setItem("userEmail", emailInput);
             localStorage.setItem("userDiet", dietInput);
+            localStorage.setItem("userAge", ageInput);
 
             // Dynamic DOM Updates: Instantly update UI text values without reloading page
             displayEmail.textContent = emailInput;
             displayDiet.textContent = dietInput;
+            displayAge.textContent = ageInput;
 
             // Success Feedback
             profileFeedback.style.color = "#2ecc71"; // Green color for success
