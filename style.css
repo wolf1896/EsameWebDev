@@ -226,6 +226,7 @@ select:focus, input:focus {
     margin-bottom: 30px;
     display: flex;
     justify-content: center;
+    align-items: center;
     width: 100%;            
     flex-basis: 100%;
     flex-shrink: 0;
@@ -235,11 +236,15 @@ select:focus, input:focus {
 
 .birthday-card {
     width: 100%;
-    max-width: 700px;         
+    max-width: 700px;
+    margin: 0 auto;
     text-align: center;
     border-top: 4px solid #e67e22;
     background-color: #fffaf6;     
     box-sizing: border-box;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(230, 126, 34, 0.15);
+    padding: 30px;
 }
 
 .birthday-card h2 {
