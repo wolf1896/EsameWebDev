@@ -48,4 +48,4 @@ A single-page recipe discovery and meal planning application built with vanilla 
 
 ---
 
-**Author:** Mattia Lupo — EPICODE Web Development Student
+**Author:** Mattia Lupo — EPICODE
