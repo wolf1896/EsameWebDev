@@ -173,7 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .catch(err => {
                 if (featuredRecipeContainer) {
-                    featuredRecipeContainer.innerHTML = "<p style='color: #e74c3c; text-align: center;'>Unable to load recommendation recommendation matrix.</p>";
+                    featuredRecipeContainer.innerHTML = "<p style='color: #e74c3c; text-align: center;'>Unable to load recommendation.</p>";
                 }
                 console.error(err);
             });
@@ -371,7 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const plannerCard = document.createElement("div");
                 plannerCard.classList.add("recipe-item");
 
-                // Injected a full-width green "Download PDF" button button element layout
+
                 plannerCard.innerHTML = `
                     <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
                     <div class="recipe-info">
@@ -553,7 +553,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         });
                 });
 
-                // Remove structural element button selector
                 plannerCard.querySelector(".delete-btn").addEventListener("click", () => {
                     currentPlanner.splice(index, 1);
                     localStorage.setItem("mealPlanner", JSON.stringify(currentPlanner));
@@ -609,7 +608,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     }
 
-                    // Strict alphabetical sorting sorting metric rule configuration
                     const sortedMeals = data.meals.sort((a, b) => a.strMeal.localeCompare(b.strMeal));
 
                     discoverFeedback.textContent = query === "" 
